@@ -1,0 +1,42 @@
+{
+  "name": "@superhero/eventflow-hub",
+  "version": "4.0.0",
+  "description": "Eventflow hub is the central server component in the eventflow ecosystem.",
+  "keywords": [
+    "eventflow",
+    "eventflow-bus",
+    "eventflow-hub"
+  ],
+  "main": "src/config.js",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./manager/*": "./manager/*.js"
+  },
+  "dependencies": {
+    "@superhero/eventflow-db": "^4.1.0",
+    "@superhero/id-name-generator": "^4.0.0",
+    "@superhero/log": "^4.0.0",
+    "@superhero/openssl": "^4.0.2",
+    "@superhero/tcp-record-channel": "^4.2.1",
+    "@superhero/deep": "^4.1.0"
+  },
+  "devDependencies": {
+    "@superhero/config": "^4.1.2",
+    "@superhero/locator": "^4.2.0"
+  },
+  "scripts": {
+    "test-build": "npm explore @superhero/eventflow-db -- npm run test-build",
+    "test-only": "node --test-only --trace-warnings --test --experimental-test-coverage",
+    "test": "node --test --experimental-test-coverage"
+  },
+  "author": {
+    "name": "Erik Landvall",
+    "email": "erik@landvall.se"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superhero/eventflow-hub.git"
+  }
+}
