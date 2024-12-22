@@ -5,7 +5,7 @@ export default
 {
   dependency : { '@superhero/eventflow-db'  : '@superhero/eventflow-db' },
   bootstrap  : { '@superhero/eventflow-hub' : 'eventflow/hub' },
-  locator    : { '@superhero/eventflow-hub' : './index.js' },
+  locator    : { '@superhero/eventflow-hub' : true },
   eventflow  :
   {
     hub:

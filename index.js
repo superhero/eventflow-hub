@@ -69,7 +69,7 @@ export default class Hub
     this.subscribers.destroy()
     this.log.warn`hub has quit`
     await this.db.updateHubToQuit(this.#hubID)
-    setImmediate(() => this.db.close())
+    setTimeout(() => this.db.close(), 500)
   }
 
   #bootstrapServer()
