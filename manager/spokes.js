@@ -8,10 +8,7 @@ export default class SpokesManager
 
   destroy()
   {
-    for(const socket of this.#set.values())
-    {
-      socket.end()
-    }
+    this.#set.clear()
   }
 
   add(socket)

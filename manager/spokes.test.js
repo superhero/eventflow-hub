@@ -34,15 +34,14 @@ suite('@superhero/eventflow-hub/manager/spokes', () =>
   test('Destroy all sockets', async () =>
   {
     const manager = new SpokesManager()
-    const socket1 = { id: 'socket1', end: () => socket1.destroyed = true }
-    const socket2 = { id: 'socket2', end: () => socket2.destroyed = true }
+    const socket1 = { id: 'socket1' }
+    const socket2 = { id: 'socket2' }
 
     manager.add(socket1)
     manager.add(socket2)
     manager.destroy()
 
-    assert.strictEqual(socket1.destroyed, true)
-    assert.strictEqual(socket2.destroyed, true)
+    assert.strictEqual(manager.all.length, 0)
   })
 
   test('Handle deleting non-existent socket gracefully', async () =>

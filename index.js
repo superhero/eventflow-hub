@@ -24,7 +24,11 @@ export function locate(locator)
 export default class Hub
 {
   #hubID
-  channel = new Channel()
+
+  abortion    = new AbortController()
+  channel     = new Channel()
+  spokes      = new SpokesManager()
+  subscribers = new SubscribersManager()
 
   get hubID()
   {
@@ -45,11 +49,8 @@ export default class Hub
     this.#hubID       = (new IdNameGenerator().generateId() + '.' + config.NAME).toUpperCase()
     this.config       = config
     this.db           = db
-    this.abortion     = new AbortController()
     this.log          = new Log({ label: `[${config.NAME}]` })
     this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db, this.log)
-    this.spokes       = new SpokesManager()
-    this.subscribers  = new SubscribersManager()
 
     this.channel.on('record', this.#onRecord.bind(this))
   }
@@ -63,11 +64,20 @@ export default class Hub
 
   async destroy()
   {
-    this.abortion.abort()
+    const reason = new Error('hub is destroyed')
+    reason.code  = 'E_EVENTFLOW_HUB_DESTROYED'
+
+    this.abortion.abort(reason)
     this.server?.close()
+
+    for(const socket of this.spokes.all)
+    {
+      socket.end()
+    }
+
     this.spokes.destroy()
     this.subscribers.destroy()
-    this.log.warn`hub has quit`
+    this.log.warn`destroyed`
     await this.db.updateHubToQuit(this.#hubID)
     setTimeout(() => this.db.close(), 500)
   }
@@ -269,7 +279,7 @@ export default class Hub
 
   async #attemptToConsumeAndBroadcastPublishedMessage(domain, id, name, pid)
   {
-    const consumed = await this.db.updateEventPublishedToConsumedByHub(domain, id, this.#hubID)
+    const consumed = await this.db.updateEventPublishedToConsumedByHub(id, this.#hubID)
 
     if(consumed)
     {
