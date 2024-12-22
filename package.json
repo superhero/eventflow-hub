@@ -1,13 +1,13 @@
 {
   "name": "@superhero/eventflow-hub",
-  "version": "4.0.0",
+  "version": "4.0.2",
   "description": "Eventflow hub is the central server component in the eventflow ecosystem.",
   "keywords": [
     "eventflow",
-    "eventflow-bus",
-    "eventflow-hub"
+    "hub",
+    "bus"
   ],
-  "main": "src/config.js",
+  "main": "config.js",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -15,12 +15,13 @@
     "./manager/*": "./manager/*.js"
   },
   "dependencies": {
-    "@superhero/eventflow-db": "^4.1.0",
+    "@superhero/eventflow-db": "^4.1.1",
     "@superhero/id-name-generator": "^4.0.0",
     "@superhero/log": "^4.0.0",
+    "@superhero/eventflow-certificates": "^4.0.2",
     "@superhero/openssl": "^4.0.2",
     "@superhero/tcp-record-channel": "^4.2.1",
-    "@superhero/deep": "^4.1.0"
+    "@superhero/deep": "^4.2.0"
   },
   "devDependencies": {
     "@superhero/config": "^4.1.2",

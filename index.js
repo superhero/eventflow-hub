@@ -1,10 +1,11 @@
 import tls                  from 'node:tls'
+import deepmerge            from '@superhero/deep/merge'
 import Channel              from '@superhero/tcp-record-channel'
 import IdNameGenerator      from '@superhero/id-name-generator'
 import Log                  from '@superhero/log'
 import SpokesManager        from '@superhero/eventflow-hub/manager/spokes'
 import SubscribersManager   from '@superhero/eventflow-hub/manager/subscribers'
-import CertificatesManager  from '@superhero/eventflow-hub/manager/certificates'
+import CertificatesManager  from '@superhero/eventflow-certificates'
 import { setInterval as asyncInterval } from 'node:timers/promises'
 
 export function locate(locator)
@@ -184,8 +185,8 @@ export default class Hub
     client.setKeepAlive(true, this.config.KEEP_ALIVE_INTERVAL)
     client.resume()
 
-    this.log.info`connected to ${client.id}`
-    const message = `connected to ${client.id}`
+    this.log.info`connected ${client.id}`
+    const message = `connected ${client.id}`
     await this.db.persistLog({ agent:this.#hubID, message })
   }
 
@@ -193,13 +194,13 @@ export default class Hub
   {
     this.spokes.delete(client)
     this.subscribers.deleteBySocket(client)
-    this.log.info`disconnected to ${client.id}`
-    const message = `disconnected to ${client.id}`
+    this.log.info`disconnected ${client.id}`
+    const message = `disconnected ${client.id}`
     await this.db.persistLog({ agent:this.#hubID, message })
   }
 
   /**
-   * @see @superhero/socket-channel
+   * @see @superhero/tcp-record-channel
    * @param {String[]} record The unit seperated record
    * @param {node:tls.TLSSocket} client A spoke or peer hub client
    */
@@ -223,28 +224,29 @@ export default class Hub
    * hubs, but rather rely on a reactional architecture.
    * 
    * @param {node:tls.TLSSocket} peerHub
-   * @param {string} peerHubIp 
+   * @param {string} peerHubID
+   * @param {string} peerHubIP 
    * @param {string} peerHubPort
    */
-  async #onPeerHubOnlineMessage(peerHub, peerHubIp, peerHubPort)
+  async #onPeerHubOnlineMessage(peerHub, peerHubID, peerHubIP, peerHubPort)
   {
     // prevent possible loop
-    if(peerHub.id === this.#hubID)
+    if(peerHubID === this.#hubID)
     {
       return
     }
 
     try
     {
-      this.channel.broadcast(this.spokes.all, [ 'online', peerHubIp, peerHubPort ])
+      this.channel.broadcast(this.spokes.all, [ 'online', peerHubID, peerHubIP, peerHubPort ])
     }
     catch(error)
     {
-      this.log.fail`failed to broadcast peer hub ${peerHub.id} online event [${error.code}] ${error.message}`
+      this.log.fail`failed to broadcast peer hub ${peerHubID} online event [${error.code}] ${error.message}`
       return
     }
 
-    this.log.info`broadcasted peer hub ${peerHub.id} online event`
+    this.log.info`broadcasted peer hub ${peerHubID} › ${peerHubIP}:${peerHubPort} online event`
   }
 
   #onSpokeSubscribeMessage(spoke, domain, name)
@@ -320,8 +322,8 @@ export default class Hub
       }
       catch(error)
       {
-        this.log.fail`failed to connect to peer hub ${hubID}: [${error.code}] ${error.message}`
-        const message = `failed to connect to peer hub ${hubID}: [${error.code}] ${error.message}`
+        this.log.fail`failed to connect to peer hub ${hubID} [${error.code}] ${error.message}`
+        const message = `failed to connect to peer hub ${hubID} [${error.code}] ${error.message}`
         await this.db.persistLog({ agent:this.#hubID, message, error })
       }
     }
@@ -336,11 +338,11 @@ export default class Hub
       ca            = rootCA.cert,
       certChain     = hubLeaf.cert + hubICA.cert,
       dynamicConfig = { servername:hubID, host:ip, port, ca, cert:certChain, key:hubLeaf.key, passphrase:hubLeaf.pass },
-      peerHubConfig = Object.assign(dynamicConfig, this.config.TCP_SOCKET_CLIENT_OPTIONS),
+      peerHubConfig = deepmerge(dynamicConfig, this.config.TCP_SOCKET_CLIENT_OPTIONS),
       peerHub       = await this.channel.createTlsClient(peerHubConfig)
 
     peerHub.id = peerHub.getPeerCertificate().subject.UID
-    this.channel.transmit(peerHub, [ 'online', this.config.EXTERNAL_IP, this.config.EXTERNAL_PORT ])
+    this.channel.transmit(peerHub, [ 'online', this.#hubID, this.config.EXTERNAL_IP, this.config.EXTERNAL_PORT ])
     this.log.info`broadcasted online status to peer hub ${peerHub.id}`
     const message = `broadcasted online status to peer hub ${peerHub.id}`
     await this.db.persistLog({ agent:this.#hubID, message })

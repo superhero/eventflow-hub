@@ -73,9 +73,10 @@ suite('@superhero/eventflow-hub', () =>
 
       await sub.test('Broadcasts peer hub online event', async () => await new Promise(async (accept) => 
       {
-        channel.on('record', ([ type ,, port ]) => 'online' === type 
-                                                && '50002'  === port 
-                                                && hub2.destroy().then(accept))
+        channel.on('record', ([ type, id ,, port ]) => 'online'   === type 
+                                                    && hub2.hubID === id
+                                                    && '50002'    === port 
+                                                    && hub2.destroy().then(accept))
 
         const 
           locator2  = new Locator(),

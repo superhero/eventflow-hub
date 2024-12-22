@@ -37,20 +37,6 @@ npm test
   ✔ Connections and Communication (12880.634724ms)
 ✔ @superhero/eventflow-hub/hub (13122.085188ms)
 
-▶ @superhero/eventflow-hub/manager/certificates
-  ✔ Throw error if CERT_PASS_ENCRYPTION_KEY is missing in config (1.931823ms)
-  ▶ Get root certificate
-    ✔ Get same root certificate each time lazyloading it (0.421813ms)
-
-    ▶ Get intermediate certificate
-      ▶ Get leaf certificate
-        ✔ Clear cache and still get the same certificates (6284.100912ms)
-        ✔ Revoke certificate and regenerate when expired (10.43074ms)
-      ✔ Get leaf certificate (9226.667566ms)
-    ✔ Get intermediate certificate (11230.17401ms)
-  ✔ Get root certificate (13150.284397ms)
-✔ @superhero/eventflow-hub/manager/certificates (13155.312263ms)
-
 ▶ @superhero/eventflow-hub/manager/spokes
   ✔ Add and retrieve all sockets (3.451128ms)
   ✔ Delete a socket (0.227951ms)
@@ -68,25 +54,23 @@ npm test
   ✔ Not throw errors when deleting non-existent subscribers (0.362547ms)
 ✔ @superhero/eventflow-hub/manager/subscribers (5.36466ms)
 
-tests 22
-suites 6
-pass 21
+tests 14
+suites 5
+pass 14
 
 -------------------------------------------------------------------------------------------------------------------------
 file                    | line % | branch % | funcs % | uncovered lines
 -------------------------------------------------------------------------------------------------------------------------
 config.js               | 100.00 |   100.00 |  100.00 | 
-index.js                |  70.42 |    65.85 |   74.07 | 39-42 109-113 133-135 139-143 146-150 172-174 234-235 242-245 2…
+index.js                |  73.36 |    74.42 |   74.07 | 40-43 134-136 140-144 147-151 173-175 244-247 253-256 259-262 26…
 index.test.js           | 100.00 |   100.00 |  100.00 | 
 manager                 |        |          |         | 
- certificates.js        |  85.71 |    87.50 |   88.24 | 137-140 150-154 194-200 204-213 216-231
- certificates.test.js   | 100.00 |   100.00 |  100.00 | 
  spokes.js              | 100.00 |   100.00 |  100.00 | 
  spokes.test.js         | 100.00 |   100.00 |  100.00 | 
  subscribers.js         |  78.21 |   100.00 |   83.33 | 61-77
  subscribers.test.js    | 100.00 |   100.00 |  100.00 | 
 -------------------------------------------------------------------------------------------------------------------------
-all files               |  85.07 |    87.22 |   89.36 | 
+all files               |  84.20 |    88.89 |   87.88 | 
 -------------------------------------------------------------------------------------------------------------------------
 ```
 
