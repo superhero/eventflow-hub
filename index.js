@@ -11,8 +11,8 @@ import { setInterval as asyncInterval } from 'node:timers/promises'
 export function locate(locator)
 {
   const
-    config = locator('@superhero/config').find('eventflow/hub', {}),
-    db     = locator('@superhero/eventflow-db'),
+    config = locator.config.find('eventflow/hub', {}),
+    db     = locator.locate('@superhero/eventflow-db'),
     hub    = new Hub(config, db)
 
   return hub

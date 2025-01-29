@@ -1,6 +1,5 @@
 import assert  from 'node:assert'
 import util    from 'node:util'
-import Config  from '@superhero/config'
 import Locator from '@superhero/locator'
 import Channel from '@superhero/tcp-record-channel'
 import { suite, test, beforeEach, afterEach } from 'node:test'
@@ -16,13 +15,11 @@ suite('@superhero/eventflow-hub', () =>
     if(beforeEach.skip) return
     locator = new Locator()
     locator.log.config.mute = true
-    const config = new Config()
-    await config.add('@superhero/eventflow-db')
-    await config.add('./config.js')
-    config.assign({ eventflow: { hub: { certificates: { CERT_PASS_ENCRYPTION_KEY: 'encryptionKey123' }}}})
-    locator.set('@superhero/config', config)
+    await locator.config.add('@superhero/eventflow-db')
+    await locator.config.add('./config.js')
+    locator.config.assign({ eventflow: { hub: { certificates: { CERT_PASS_ENCRYPTION_KEY: 'encryptionKey123' }}}})
     await locator.eagerload('@superhero/eventflow-db')
-    await locator.eagerload(config.find('locator'))
+    await locator.eagerload(locator.config.find('locator'))
     hub = locator('@superhero/eventflow-hub')
     hub.log.config.mute = true
     await hub.bootstrap()
@@ -78,14 +75,11 @@ suite('@superhero/eventflow-hub', () =>
                                                     && '50002'    === port 
                                                     && hub2.destroy().then(accept))
 
-        const 
-          locator2  = new Locator(),
-          config2   = new Config()
-
+        const locator2 = new Locator()
         locator2.log.config.mute = true
-        await config2.add('@superhero/eventflow-db')
-        await config2.add('./config.js')
-        config2.assign(
+        await locator2.config.add('@superhero/eventflow-db')
+        await locator2.config.add('./config.js')
+        locator2.config.assign(
         { eventflow:
           { hub:
             { INTERNAL_PORT:50002,
@@ -93,9 +87,8 @@ suite('@superhero/eventflow-hub', () =>
               certificates:
               { CERT_PASS_ENCRYPTION_KEY: 'encryptionKey123' }}}})
 
-        locator2.set('@superhero/config', config2)
         await locator2.eagerload('@superhero/eventflow-db')
-        await locator2.eagerload(config2.find('locator'))
+        await locator2.eagerload(locator2.config.find('locator'))
         const hub2 = locator2('@superhero/eventflow-hub')
         hub2.log.config.mute = true
         await hub2.bootstrap()
