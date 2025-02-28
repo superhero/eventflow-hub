@@ -3,8 +3,8 @@
  */
 export default
 {
-  dependency : { '@superhero/eventflow-db'  : '@superhero/eventflow-db' },
-  bootstrap  : { '@superhero/eventflow-hub' : 'eventflow/hub' },
+  bootstrap  : { '@superhero/eventflow-hub' : true },
+  dependency : { '@superhero/eventflow-db'  : true },
   locator    : { '@superhero/eventflow-hub' : true },
   eventflow  :
   {
