@@ -106,10 +106,10 @@ export default class Hub
         this.server.on('error', this.#onServerError.bind(this))
         this.server.on('close', this.#onServerClose.bind(this))
 
+        this.log.info`listen on ${this.config.INTERNAL_IP}:${this.config.INTERNAL_PORT}`
+
         await this.#persistHubOnline()
         await this.#broadcastHubOnlineToPeerHubs()
-
-        this.log.info`listen on ${this.config.INTERNAL_IP}:${this.config.INTERNAL_PORT}`
 
         accept()
       })
@@ -342,15 +342,18 @@ export default class Hub
     }
   }
 
-  async #transmitHubOnlineToPeerHub(hubID, ip, port)
+  async #transmitHubOnlineToPeerHub(servername, host, port)
   {
     const
       rootCA        = await this.certificates.root,
       hubICA        = await this.certificates.intermediate,
       hubLeaf       = await this.certificates.leaf,
       ca            = rootCA.cert,
-      certChain     = hubLeaf.cert + hubICA.cert,
-      dynamicConfig = { servername:hubID, host:ip, port, ca, cert:certChain, key:hubLeaf.key, passphrase:hubLeaf.pass },
+      cert          = hubLeaf.cert + hubICA.cert,
+      key           = hubLeaf.key,
+      passphrase    = hubLeaf.pass,
+      timeout       = Number(this.config.PEER_HUB_ONLINE_TIMEOUT),
+      dynamicConfig = { servername, host, port, ca, cert, key, passphrase, timeout },
       peerHubConfig = deepmerge(dynamicConfig, this.config.TCP_SOCKET_CLIENT_OPTIONS),
       peerHub       = await this.channel.createTlsClient(peerHubConfig)
     
