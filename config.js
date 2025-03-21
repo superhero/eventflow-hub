@@ -6,6 +6,7 @@ export default
   bootstrap  : { '@superhero/eventflow-hub' : true },
   dependency : { '@superhero/eventflow-db'  : true },
   locator    : { '@superhero/eventflow-hub' : true },
+  destroy    : { '@superhero/eventflow-db'  : false },
   eventflow  :
   {
     hub:
@@ -19,8 +20,6 @@ export default
       TCP_SOCKET_SERVER_OPTIONS : process.env.EVENTFLOW_HUB_TCP_SOCKET_SERVER_OPTIONS ?? {},
       TCP_SOCKET_CLIENT_OPTIONS : process.env.EVENTFLOW_HUB_TCP_SOCKET_CLIENT_OPTIONS ?? {},
       KEEP_ALIVE_INTERVAL       : process.env.EVENTFLOW_HUB_KEEP_ALIVE_INTERVAL       ?? 60e3,
-      PEER_HUB_ONLINE_TIMEOUT   : process.env.EVENTFLOW_HUB_PEER_HUB_ONLINE_TIMEOUT   ?? 5e3,
-      SPOKE_ID_MESSAGE_TIMEOUT  : process.env.EVENTFLOW_HUB_SPOKE_ID_MESSAGE_TIMEOUT  ?? 5e3,
       SHEDULED_INTERVAL_DELAY   : process.env.EVENTFLOW_HUB_SHEDULED_INTERVAL_DELAY   ?? 1e3,
 
       certificates:

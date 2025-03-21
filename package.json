@@ -1,6 +1,6 @@
 {
   "name": "@superhero/eventflow-hub",
-  "version": "4.0.9",
+  "version": "4.0.10",
   "description": "Eventflow hub is the central server component in the eventflow ecosystem.",
   "keywords": [
     "eventflow",
@@ -22,7 +22,7 @@
     "@superhero/deep": "^4.2.0"
   },
   "devDependencies": {
-    "@superhero/locator": "^4.2.4"
+    "@superhero/locator": "^4.2.5"
   },
   "scripts": {
     "test-build": "npm explore @superhero/eventflow-db -- npm run test-build",

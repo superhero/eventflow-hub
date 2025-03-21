@@ -8,6 +8,8 @@ import SubscribersManager   from '@superhero/eventflow-hub/manager/subscribers'
 import CertificatesManager  from '@superhero/eventflow-certificates'
 import { setInterval as asyncInterval } from 'node:timers/promises'
 
+const sleep = (ms) => new Promise((accept) => setTimeout(accept, ms))
+
 export function locate(locator)
 {
   const
@@ -79,7 +81,8 @@ export default class Hub
     this.subscribers.destroy()
     this.log.warn`destroyed`
     await this.db.updateHubToQuit(this.#hubID)
-    setTimeout(() => this.db.close(), 500)
+    await sleep(1e3)
+    await this.db.close()
   }
 
   #bootstrapServer()
@@ -350,7 +353,8 @@ export default class Hub
       dynamicConfig = { servername:hubID, host:ip, port, ca, cert:certChain, key:hubLeaf.key, passphrase:hubLeaf.pass },
       peerHubConfig = deepmerge(dynamicConfig, this.config.TCP_SOCKET_CLIENT_OPTIONS),
       peerHub       = await this.channel.createTlsClient(peerHubConfig)
-
+    
+    this.log.info`peer hub connection established ${peerHub.id}`
     peerHub.id = peerHub.getPeerCertificate().subject.UID
     this.channel.transmit(peerHub, [ 'online', this.#hubID, this.config.EXTERNAL_IP, this.config.EXTERNAL_PORT ])
     this.log.info`broadcasted online status to peer hub ${peerHub.id}`
