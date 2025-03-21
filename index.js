@@ -54,6 +54,15 @@ export default class Hub
     this.log          = new Log({ label: `[${config.NAME}]` })
     this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db, this.log)
 
+    for(const level of [ 'info', 'warn', 'fail' ])
+    {
+      this.log[level] = (args) => 
+      {
+        this.log.emit(level, ...args)
+        return this.log.basic(...args)
+      }
+    }
+
     this.channel.on('record', this.#onRecord.bind(this))
   }
 
@@ -151,15 +160,13 @@ export default class Hub
 
   async #onServerError(error)
   {
-    this.log.fail`server error [${error.code}] ${error.message}`
-    const message = `server error [${error.code}] ${error.message}`
+    const message = this.log.fail`server error [${error.code}] ${error.message}`
     await this.db.persistLog({ agent:this.#hubID, message, error })
   }
 
   async #onClientError(client, error)
   {
-    this.log.fail`observed client error [${error.code}] ${error.message} in ${client.id}`
-    const message = `observed client error [${error.code}] ${error.message} in ${client.id}`
+    const message = this.log.fail`observed client error [${error.code}] ${error.message} in ${client.id}`
     await this.db.persistLog({ agent:this.#hubID, message, error })
   }
 
@@ -198,8 +205,7 @@ export default class Hub
     client.setKeepAlive(true, this.config.KEEP_ALIVE_INTERVAL)
     client.resume()
 
-    this.log.info`connected ${client.id}`
-    const message = `connected ${client.id}`
+    const message = this.log.info`connected ${client.id}`
     await this.db.persistLog({ agent:this.#hubID, message })
   }
 
@@ -207,8 +213,7 @@ export default class Hub
   {
     this.spokes.delete(client)
     this.subscribers.deleteBySocket(client)
-    this.log.info`disconnected ${client.id}`
-    const message = `disconnected ${client.id}`
+    const message = this.log.info`disconnected ${client.id}`
     await this.db.persistLog({ agent:this.#hubID, message })
   }
 
@@ -335,9 +340,9 @@ export default class Hub
       }
       catch(error)
       {
-        this.log.fail`failed to connect to peer hub ${hubID} [${error.code}] ${error.message}`
-        const message = `failed to connect to peer hub ${hubID} [${error.code}] ${error.message}`
+        const message = this.log.fail`failed to connect to peer hub ${hubID} [${error.code}] ${error.message}`
         await this.db.persistLog({ agent:this.#hubID, message, error })
+        await this.db.updateHubToQuit(hubID)
       }
     }
   }
@@ -356,12 +361,10 @@ export default class Hub
       dynamicConfig = { servername, host, port, ca, cert, key, passphrase, timeout },
       peerHubConfig = deepmerge(dynamicConfig, this.config.TCP_SOCKET_CLIENT_OPTIONS),
       peerHub       = await this.channel.createTlsClient(peerHubConfig)
-    
-    this.log.info`peer hub connection established ${peerHub.id}`
+
     peerHub.id = peerHub.getPeerCertificate().subject.UID
     this.channel.transmit(peerHub, [ 'online', this.#hubID, this.config.EXTERNAL_IP, this.config.EXTERNAL_PORT ])
-    this.log.info`broadcasted online status to peer hub ${peerHub.id}`
-    const message = `broadcasted online status to peer hub ${peerHub.id}`
+    const message = this.log.info`broadcasted online status to peer hub ${peerHub.id}`
     await this.db.persistLog({ agent:this.#hubID, message })
 
     peerHub.end()
@@ -374,15 +377,34 @@ export default class Hub
    */
   async #sheduledInterval(delay)
   {
+    const signal = this.abortion.signal
+
+    if(signal.aborted)
+    {
+      return
+    }
+
+    if(0 === this.spokes.amount
+    && await this.db.hasHubQuit(this.#hubID))
+    {
+      const message = this.log.warn`hub was registered as "quit" by peer hub, probably caused by network issues between peer hubs`
+      await this.db.persistLog({ agent:this.#hubID, message })
+      return await this.destroy()
+    }
+
     try
     {
       const
         readScheduledEvents = this.db.readEventsScheduled.bind(this.db),
-        signal              = this.abortion.signal,
         asyncIterator       = asyncInterval(delay, readScheduledEvents, { signal })
 
       for await (const sheduledEvents of asyncIterator) 
       {
+        if(signal.aborted)
+        {
+          return
+        }
+
         for(const scheduledEvent of await sheduledEvents())
         {
           if(signal.aborted)
@@ -407,8 +429,7 @@ export default class Hub
           }
           catch (error)
           {
-            this.log.fail`failed to execute scheduled event ${id}: ${domain} › ${name} [${error.code}] ${error.message}`
-            const message = `failed to execute scheduled event ${id}: ${domain} › ${name} [${error.code}] ${error.message}`
+            const message = this.log.fail`failed to execute scheduled event ${id}: ${domain} › ${name} [${error.code}] ${error.message}`
             await this.db.updateEventScheduledFailed(domain, id)
             await this.db.persistLog({ agent:this.#hubID, message, error })
             throw error
@@ -420,8 +441,7 @@ export default class Hub
           }
           else
           {
-            this.log.fail`failed to execute already consumed scheduled event ${id}: ${domain} › ${name}`
-            const message = `failed to execute already consumed scheduled event ${id}: ${domain} › ${name}`
+            const message = this.log.fail`failed to execute already consumed scheduled event ${id}: ${domain} › ${name}`
             await this.db.updateEventScheduledFailed(domain, id)
             await this.db.persistLog({ agent:this.#hubID, message, error })
           }
@@ -430,16 +450,12 @@ export default class Hub
     }
     catch(error)
     {
-      this.log.fail`failed to execute scheduled interval ${error.message} [${error.code}]`
-      const message = `failed to execute scheduled interval ${error.message} [${error.code}]`
+      const message = this.log.fail`failed to execute scheduled interval ${error.message} [${error.code}]`
       await this.db.persistLog({ agent:this.#hubID, message, error })
     }
     finally
     {
-      if(this.abortion.signal.aborted === false)
-      {
-        setImmediate(this.#sheduledInterval.bind(this, delay))
-      }
+      setImmediate(this.#sheduledInterval.bind(this, delay))
     }
   }
 }

@@ -6,6 +6,11 @@ export default class SpokesManager
 {
   #set = new Set
 
+  get amount()
+  {
+    return this.#set.size
+  }
+
   destroy()
   {
     this.#set.clear()
