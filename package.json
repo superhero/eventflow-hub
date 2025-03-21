@@ -1,6 +1,6 @@
 {
   "name": "@superhero/eventflow-hub",
-  "version": "4.0.14",
+  "version": "4.0.15",
   "description": "Eventflow hub is the central server component in the eventflow ecosystem.",
   "keywords": [
     "eventflow",

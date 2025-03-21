@@ -56,7 +56,7 @@ export default class Hub
 
     for(const level of [ 'info', 'warn', 'fail' ])
     {
-      this.log[level] = (args) => 
+      this.log[level] = (...args) => 
       {
         this.log.emit(level, ...args)
         return this.log.basic(...args)
