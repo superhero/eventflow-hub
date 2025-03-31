@@ -13,10 +13,10 @@ const sleep = (ms) => new Promise((accept) => setTimeout(accept, ms))
 export function locate(locator)
 {
   const
-    certifications  = locator.config.find('eventflow/certificates', {}),
-    config          = locator.config.find('eventflow/hub', { certifications }),
-    db              = locator.locate('@superhero/eventflow-db'),
-    hub             = new Hub(config, db)
+    certificates  = locator.config.find('eventflow/certificates', {}),
+    config        = locator.config.find('eventflow/hub', { certificates }),
+    db            = locator.locate('@superhero/eventflow-db'),
+    hub           = new Hub(config, db)
 
   return hub
 }
