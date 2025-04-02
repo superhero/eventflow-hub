@@ -1,6 +1,6 @@
 {
   "name": "@superhero/eventflow-hub",
-  "version": "4.3.7",
+  "version": "4.3.8",
   "description": "Eventflow hub is the central server component in the eventflow ecosystem.",
   "keywords": [
     "eventflow",
@@ -16,8 +16,8 @@
   "dependencies": {
     "@superhero/id-name-generator": "^4.0.0",
     "@superhero/log": "^4.0.1",
-    "@superhero/eventflow-certificates": "^4.3.6",
-    "@superhero/eventflow-db": "^4.3.7",
+    "@superhero/eventflow-certificates": "^4.3.8",
+    "@superhero/eventflow-db": "^4.3.8",
     "@superhero/tcp-record-channel": "^4.2.2",
     "@superhero/deep": "^4.2.0"
   },
