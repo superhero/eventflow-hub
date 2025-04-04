@@ -128,11 +128,14 @@ export default class Hub
 
   async #serverSNICallback(hostname, cb)
   {
-    if(hostname !== this.#hubID)
+    hostname = hostname.toLowerCase()
+    const hubID = this.#hubID.toLowerCase()
+
+    if(hostname !== hubID)
     {
       const error = new Error('invalid hostname')
       error.code  = 'E_EVENTFLOW_INVALID_HOSTNAME'
-      error.cause = `hostname ${hostname} mismatch with hub id ${this.#hubID}`
+      error.cause = `hostname ${hostname} mismatch with hub ${hubID}`
       return cb(error)
     }
 
