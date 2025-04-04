@@ -53,7 +53,7 @@ export default class Hub
     this.config       = config
     this.db           = db
     this.log          = new Log({ label: `[EVENTFLOW:HUB:${this.#hubID}]` })
-    this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db, this.log)
+    this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db)
 
     for(const level of [ 'info', 'warn', 'fail' ])
     {
