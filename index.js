@@ -49,10 +49,10 @@ export default class Hub
       throw error
     }
 
-    this.#hubID       = (config.NAME + '.' + new IdNameGenerator().generateId()).toUpperCase()
+    this.#hubID       = (new IdNameGenerator().generateId() + '.' + config.NAME).toUpperCase()
     this.config       = config
     this.db           = db
-    this.log          = new Log({ label: `[EVENTFLOW:HUB:${this.#hubID}]` })
+    this.log          = new Log(Object.assign({ label: `[EVENTFLOW:HUB:${this.#hubID}]` }, config.log))
     this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db)
 
     for(const level of [ 'info', 'warn', 'fail' ])
@@ -158,6 +158,7 @@ export default class Hub
     }
     catch(error)
     {
+      this.log.fail`failed to create secure context [${error.code}] ${error}`
       return cb(error)
     }
   }
