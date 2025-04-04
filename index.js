@@ -52,7 +52,7 @@ export default class Hub
     this.#hubID       = (new IdNameGenerator().generateId() + '.' + config.NAME).toUpperCase()
     this.config       = config
     this.db           = db
-    this.log          = new Log({ label: `[${config.NAME}]` })
+    this.log          = new Log({ label: `[EVENTFLOW:HUB:${config.NAME}]` })
     this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db, this.log)
 
     for(const level of [ 'info', 'warn', 'fail' ])
