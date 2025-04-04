@@ -49,10 +49,10 @@ export default class Hub
       throw error
     }
 
-    this.#hubID       = (new IdNameGenerator().generateId() + '.' + config.NAME).toUpperCase()
+    this.#hubID       = (config.NAME + '.' + new IdNameGenerator().generateId()).toUpperCase()
     this.config       = config
     this.db           = db
-    this.log          = new Log({ label: `[EVENTFLOW:HUB:${config.NAME}]` })
+    this.log          = new Log({ label: `[EVENTFLOW:HUB:${this.#hubID}]` })
     this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db, this.log)
 
     for(const level of [ 'info', 'warn', 'fail' ])
