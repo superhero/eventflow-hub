@@ -3,14 +3,25 @@
  */
 export default
 {
-  bootstrap  : { '@superhero/eventflow-hub' : true },
+  bootstrap  : 
+  { 
+    '@superhero/eventflow-hub' : true 
+  },
   dependency : 
   {
-    '@superhero/eventflow-certificates'     : true,
-    '@superhero/eventflow-db'               : true
+    '@superhero/eventflow-certificates' : true,
+    '@superhero/eventflow-db'           : true
   },
-  locator    : { '@superhero/eventflow-hub' : true },
-  destroy    : { '@superhero/eventflow-db'  : false },
+  locator: 
+  {
+    '@superhero/eventflow-hub': 
+    {
+      uses:
+      [
+        '@superhero/eventflow-db'
+      ]
+    }
+  },
   eventflow  :
   {
     hub:
