@@ -52,17 +52,8 @@ export default class Hub
     this.#hubID       = (new IdNameGenerator().generateId() + '.' + config.NAME).toUpperCase()
     this.config       = config
     this.db           = db
-    this.log          = new Log(Object.assign({ label: `[EVENTFLOW:HUB:${this.#hubID}]` }, config.log))
+    this.log          = new Log(Object.assign({ label: `[EVENTFLOW:HUB:${this.#hubID}]`, returns: true }, config.log))
     this.certificates = new CertificatesManager(config.NAME, this.#hubID, config.certificates, db)
-
-    for(const level of [ 'info', 'warn', 'fail' ])
-    {
-      this.log[level] = (...args) => 
-      {
-        this.log.emit(level, ...args)
-        return this.log.basic(...args)
-      }
-    }
 
     this.channel.on('record', this.#onRecord.bind(this))
   }
