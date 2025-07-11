@@ -11,8 +11,17 @@ export default class SpokesManager
     return this.#set.size
   }
 
-  destroy()
+  async destroy()
   {
+    for(const socket of this.all)
+    {
+      await new Promise(resolve =>
+      {
+        socket.once('close', resolve)
+        socket.end()
+      })
+    }
+
     this.#set.clear()
   }
 

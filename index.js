@@ -8,8 +8,6 @@ import SubscribersManager   from '@superhero/eventflow-hub/manager/subscribers'
 import CertificatesManager  from '@superhero/eventflow-certificates'
 import { setInterval as asyncInterval } from 'node:timers/promises'
 
-const sleep = (ms) => new Promise((accept) => setTimeout(accept, ms))
-
 export function locate(locator)
 {
   const
@@ -69,21 +67,13 @@ export default class Hub
   {
     const reason = new Error('hub is destroyed')
     reason.code  = 'E_EVENTFLOW_HUB_DESTROYED'
-
     this.abortion.abort(reason)
+
     this.server?.close()
-
-    for(const socket of this.spokes.all)
-    {
-      socket.end()
-    }
-
-    this.spokes.destroy()
+    await this.spokes.destroy()
     this.subscribers.destroy()
     this.log.warn`destroyed`
     await this.db.updateHubToQuit(this.#hubID)
-    await sleep(1e3)
-    await this.db.close()
   }
 
   #bootstrapServer()
