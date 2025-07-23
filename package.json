@@ -1,6 +1,6 @@
 {
   "name": "@superhero/eventflow-hub",
-  "version": "4.7.15",
+  "version": "4.7.16",
   "description": "Eventflow hub is the central server component in the eventflow ecosystem.",
   "keywords": [
     "eventflow",
@@ -20,17 +20,17 @@
     "test": "syntax-check; node --test --test-reporter=@superhero/audit/reporter --experimental-test-coverage"
   },
   "dependencies": {
-    "@superhero/id-name-generator": "4.7.15",
-    "@superhero/log": "4.7.15",
-    "@superhero/eventflow-certificates": "4.7.15",
-    "@superhero/eventflow-db": "4.7.15",
-    "@superhero/tcp-record-channel": "4.7.15",
-    "@superhero/deep": "4.7.15"
+    "@superhero/id-name-generator": "4.7.16",
+    "@superhero/log": "4.7.16",
+    "@superhero/eventflow-certificates": "4.7.16",
+    "@superhero/eventflow-db": "4.7.16",
+    "@superhero/tcp-record-channel": "4.7.16",
+    "@superhero/deep": "4.7.16"
   },
   "devDependencies": {
-    "@superhero/audit": "4.7.15",
+    "@superhero/audit": "4.7.16",
     "@superhero/syntax-check": "0.0.2",
-    "@superhero/locator": "4.7.15"
+    "@superhero/locator": "4.7.16"
   },
   "author": {
     "name": "Erik Landvall",
