@@ -11,6 +11,7 @@
   "type": "module",
   "exports": {
     ".": "./index.js",
+    "./config": "./config.js",
     "./manager/*": "./manager/*.js"
   },
   "scripts": {
