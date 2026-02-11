@@ -122,18 +122,15 @@ export default class Hub
 
     try
     {
-      const
-        root = await this.certificates.root,
-        ica  = await this.certificates.intermediate,
-        leaf = await this.certificates.leaf
-  
-      const ctx = tls.createSecureContext(
-      {
-        ca          : root.cert,
-        cert        : leaf.cert + ica.cert,
-        key         : leaf.key,
-        passphrase  : leaf.pass
-      })
+      const 
+        chain = await this.certificates.getChain(),
+        ctx   = tls.createSecureContext(
+        {
+          ca          : chain.root.cert,
+          cert        : chain.leaf.cert + chain.intermediate.cert,
+          key         : chain.leaf.key,
+          passphrase  : chain.leaf.pass
+        })
 
       cb(null, ctx)
     }
@@ -336,13 +333,11 @@ export default class Hub
   async #transmitHubOnlineToPeerHub(servername, host, port)
   {
     const
-      rootCA        = await this.certificates.root,
-      hubICA        = await this.certificates.intermediate,
-      hubLeaf       = await this.certificates.leaf,
-      ca            = rootCA.cert,
-      cert          = hubLeaf.cert + hubICA.cert,
-      key           = hubLeaf.key,
-      passphrase    = hubLeaf.pass,
+      chain         = await this.certificates.getChain(),
+      ca            = chain.root.cert,
+      cert          = chain.leaf.cert + chain.intermediate.cert,
+      key           = chain.leaf.key,
+      passphrase    = chain.leaf.pass,
       timeout       = Number(this.config.PEER_HUB_ONLINE_TIMEOUT),
       dynamicConfig = { servername, host, port, ca, cert, key, passphrase, timeout },
       peerHubConfig = deepmerge(dynamicConfig, this.config.TCP_SOCKET_CLIENT_OPTIONS),
